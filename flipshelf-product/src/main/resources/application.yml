@@ -1,0 +1,59 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flipshelf-authdb
+    username: postgres
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  redis:
+    host: localhost
+    port: 6379
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
+        connectTimeout: 5000
+        readTimeout: 5000
+
+auth:
+  service:
+    url: http://localhost:8081
+
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true  # Enable Prometheus metrics export
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      productServiceCB:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slidingWindowSize: 10
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+  retry:
+    instances:
+      productServiceRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+
+  ratelimiter:
+    instances:
+      productServiceRateLimiter:
+        limitForPeriod: 200
+        limitRefreshPeriod: 1s
+        timeoutDuration: 500ms
+

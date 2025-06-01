@@ -1,0 +1,124 @@
+version: '3.8'
+services:
+  flipshelf-auth:
+    build:
+      context: ../flipshelf-auth # Path to flipshelf-auth repo
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=flipshelf-authdb
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+    ports:
+      - "8081:8081"
+    depends_on:
+      - flipshelf-authdb
+    networks:
+      - app-network
+
+  flipshelf-authdb:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: flipshelf-authdb
+    ports:
+      - "5433:5432" # Avoid conflict with other DBs
+    volumes:
+      - flipshelf_authdb_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+#  ms2:
+#    build:
+#      context: ../ms2 # Adjust path to ms2 repo
+#      dockerfile: Dockerfile
+#    environment:
+#      - DB_HOST=ms2db
+#      - DB_USER=postgres
+#      - DB_PASSWORD=root
+#    ports:
+#      - "8082:8082"
+#    depends_on:
+#      - ms2db
+#    networks:
+#      - app-network
+#
+#  ms2db:
+#    image: postgres:latest
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: root
+#      POSTGRES_DB: ms2db
+#    ports:
+#      - "5434:5432" # Avoid conflict
+#    volumes:
+#      - ms2db_data:/var/lib/postgresql/data
+#    networks:
+#      - app-network
+#
+#  ms3:
+#    build:
+#      context: ../ms3 # Adjust path to ms3 repo
+#      dockerfile: Dockerfile
+#    environment:
+#      - DB_HOST=ms3db
+#      - DB_USER=postgres
+#      - DB_PASSWORD=root
+#    ports:
+#      - "8083:8083"
+#    depends_on:
+#      - ms3db
+#    networks:
+#      - app-network
+#
+#  ms3db:
+#    image: postgres:latest
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: root
+#      POSTGRES_DB: ms3db
+#    ports:
+#      - "5435:5432" # Avoid conflict
+#    volumes:
+#      - ms3db_data:/var/lib/postgresql/data
+#    networks:
+#      - app-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - flipshelf-auth
+#      - ms2
+#      - ms3
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+
+volumes:
+  flipshelf_authdb_data:
+  prometheus_data:
+  grafana_data:
+#  ms2db_data:
+#  ms3db_data:
+
+networks:
+  app-network:
+    driver: bridge

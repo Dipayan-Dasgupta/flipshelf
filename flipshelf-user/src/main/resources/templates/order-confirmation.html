@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Confirmation</title>
+</head>
+<body>
+<h2>Hi <span th:text="${email}"></span>,</h2>
+<p>Thanks for your purchase! Here are your order details:</p>
+<ul>
+    <li><strong>Product:</strong> <span th:text="${name}"></span></li>
+    <li><strong>Quantity:</strong> <span th:text="${quantity}"></span></li>
+    <li><strong>Total:</strong> ₹<span th:text="${total}"></span></li>
+    <li><strong>Date:</strong> <span th:text="${date}"></span></li>
+</ul>
+<p>We hope to see you again soon!</p>
+</body>
+</html>

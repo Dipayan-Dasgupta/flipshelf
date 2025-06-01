@@ -1,0 +1,39 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flipshelf-authdb
+    username: postgres
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
+        connectTimeout: 5000
+        readTimeout: 5000
+
+auth:
+  service:
+    url: http://localhost:8081
+
+product:
+  service:
+    url: http://localhost:8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus  # Include the 'prometheus' endpoint
+  metrics:
+    export:
+      prometheus:
+        enabled: true  # Enable Prometheus metrics export
